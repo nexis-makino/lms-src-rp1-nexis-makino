@@ -15,6 +15,8 @@ import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
 import jp.co.sss.lms.service.StudentAttendanceService;
 import jp.co.sss.lms.util.Constants;
+import jp.co.sss.lms.util.LoginUserUtil;
+
 
 /**
  * 勤怠管理コントローラ
@@ -29,6 +31,8 @@ public class AttendanceController {
 	private StudentAttendanceService studentAttendanceService;
 	@Autowired
 	private LoginUserDto loginUserDto;
+	@Autowired
+	private LoginUserUtil loginUserUtil;
 
 	/**
 	 * 勤怠管理画面 初期表示
@@ -40,8 +44,16 @@ public class AttendanceController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
-	public String index(Model model) {
-
+	public String index(Model model)throws ParseException {
+		
+		if(loginUserUtil.isStudent()) {
+			//受講生権限の場合
+			//現在より過去に未入力が無いかチェック
+			//未入力日が存在する場合:trueをセット
+			//未入力日が存在しない場合:falseをセット
+			model.addAttribute("notEnterCheck", studentAttendanceService.notEnterCheck());
+		}
+		
 		// 勤怠一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
@@ -49,7 +61,6 @@ public class AttendanceController {
 
 		return "attendance/detail";
 	}
-
 	/**
 	 * 勤怠管理画面 『出勤』ボタン押下
 	 * 

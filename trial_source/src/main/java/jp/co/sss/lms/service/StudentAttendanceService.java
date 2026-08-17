@@ -43,7 +43,30 @@ public class StudentAttendanceService {
 	private LoginUserDto loginUserDto;
 	@Autowired
 	private TStudentAttendanceMapper tStudentAttendanceMapper;
-
+	
+	/**
+	 * 過去日の未入力チェック
+	 * 
+	 * @return 勤怠管理画面用DTOリスト
+	 * @throws ParseException
+	 */
+	public Boolean notEnterCheck()
+			throws ParseException {
+		//今日より前の過去日に、未入力の勤怠があるかどうかを判定する。
+		
+		//今日の日付を取得する。
+		//※attendanceUtil.getTrainingDate()内で、
+		//SimpleDateFormatクラスによるフォーマットパターンの設定が行われる
+		Date trainingDate = attendanceUtil.getTrainingDate();
+		
+		//tStudentAttendanceMapper.notEnterCount を呼び出し、未入力件数を取得する。
+		Integer notEnterCount = 
+		tStudentAttendanceMapper.notEnterCount(loginUserDto.getLmsUserId(), Constants.DB_FLG_FALSE, trainingDate);
+		
+		//件数が 0 より大きければ true、そうでなければ false を戻す。
+		return notEnterCount > 0;
+	}
+	
 	/**
 	 * 勤怠一覧情報取得
 	 * 
