@@ -51,7 +51,7 @@ public class AttendanceController {
 			//現在より過去に未入力が無いかチェック
 			//未入力日が存在する場合:trueをセット
 			//未入力日が存在しない場合:falseをセット
-			model.addAttribute("notEnterCheck", studentAttendanceService.notEnterCheck());
+			model.addAttribute("notEnterFlg", studentAttendanceService.notEnterCheck());
 		}
 		
 		// 勤怠一覧の取得

@@ -74,6 +74,22 @@
 	</div>
 
 	<script type="text/javascript" th:inline="javascript">
+		
+		/*<![CDATA[*/
+        const notEnterFlg = /*[[${notEnterFlg}]]*/ false;
+        /*]]>*/
+
+        // 画面読み込み完了時に実行
+        window.addEventListener('DOMContentLoaded', function() {
+
+            // trueならアラートを出す
+            if (notEnterFlg) {
+                alert("過去日の勤怠に未入力があります。");
+            }
+        });
+
+
+		
 		$(function() {
 			$("#now").text('現在の時刻は　' + getClock() + '　です。');
 			setInterval(function() {
@@ -86,21 +102,6 @@
 			const minutes = ('0' + today.getMinutes()).slice(-2);
 			return hours + ':' + minutes;
 		}
-		
-		/*<![CDATA[*/
-
-        const notEnterCheck = /*[[${notEnterCheck}]]*/ false;
-
-        // 画面読み込み完了時に実行
-        window.addEventListener('DOMContentLoaded', function() {
-
-            // trueならアラートを出す
-            if (notEnterCheck) {
-                alert("過去日の勤怠に未入力があります。");
-            }
-        });
-
-        /*]]>*/
 
 	</script>
 

@@ -66,7 +66,7 @@ public class StudentAttendanceService {
 		//件数が 0 より大きければ true、そうでなければ false を戻す。
 		return notEnterCount > 0;
 	}
-	
+
 	/**
 	 * 勤怠一覧情報取得
 	 * 
