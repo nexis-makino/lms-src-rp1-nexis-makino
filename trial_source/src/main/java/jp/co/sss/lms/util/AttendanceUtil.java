@@ -131,6 +131,62 @@ public class AttendanceUtil {
 		}
 		return map;
 	}
+	
+	/**
+	 * 時間のプルダウンマップを生成
+	 * 
+	 * @return 時間Map
+	 */
+	public LinkedHashMap<Integer, String> getHourMap() {
+		LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
+        map.put(null, "");
+        for (Integer i = 0; i <= 23; i++) {
+            map.put(i, String.format("%02d", i));
+        }
+        return map;
+	}
+	
+	/**
+	 * 分のプルダウンマップを生成
+	 * 
+	 * @return 分Map
+	 */
+	public LinkedHashMap<Integer, String> getMinuteMap() {
+		LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
+        map.put(null, "");
+        for (Integer i = 0; i <= 59; i++) {
+            map.put(i, String.format("%02d", i));
+        }
+        return map;
+	}
+	
+	/**
+	 * 時間(時)の切り出し
+	 * HH:MM形式のString文字列を引数に、先頭2文字(HH)を返す
+	 * 
+	 * @param time 時間
+	 * @return 時間(時)
+	 */
+	public Integer getHour(String time) {
+		if(time == null || time.isEmpty()) {
+			return null;	
+		}
+		return Integer.parseInt(time.substring(0,2));
+	}
+	
+	/**
+	 * 時間(分)の切り出し
+	 * HH:MM形式のString文字列を引数に、末尾2文字(MM)を返す
+	 * 
+	 * @param time 時間
+	 * @return 時間(分)
+	 */
+	public Integer getMinute(String time) {
+		if(time == null || time.isEmpty()) {
+			return null;	
+		}
+		return Integer.parseInt(time.substring(3));
+	}
 
 	/**
 	 * 研修日の判定

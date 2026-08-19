@@ -43,29 +43,6 @@ public class StudentAttendanceService {
 	private LoginUserDto loginUserDto;
 	@Autowired
 	private TStudentAttendanceMapper tStudentAttendanceMapper;
-	
-	/**
-	 * 過去日の未入力チェック
-	 * 
-	 * @return 勤怠管理画面用DTOリスト
-	 * @throws ParseException
-	 */
-	public Boolean notEnterCheck()
-			throws ParseException {
-		//今日より前の過去日に、未入力の勤怠があるかどうかを判定する。
-		
-		//今日の日付を取得する。
-		//※attendanceUtil.getTrainingDate()内で、
-		//SimpleDateFormatクラスによるフォーマットパターンの設定が行われる
-		Date trainingDate = attendanceUtil.getTrainingDate();
-		
-		//tStudentAttendanceMapper.notEnterCount を呼び出し、未入力件数を取得する。
-		Integer notEnterCount = 
-		tStudentAttendanceMapper.notEnterCount(loginUserDto.getLmsUserId(), Constants.DB_FLG_FALSE, trainingDate);
-		
-		//件数が 0 より大きければ true、そうでなければ false を戻す。
-		return notEnterCount > 0;
-	}
 
 	/**
 	 * 勤怠一覧情報取得
@@ -242,6 +219,8 @@ public class StudentAttendanceService {
 		attendanceForm.setUserName(loginUserDto.getUserName());
 		attendanceForm.setLeaveFlg(loginUserDto.getLeaveFlg());
 		attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
+		attendanceForm.setHhs(attendanceUtil.getHourMap());
+		attendanceForm.setMis(attendanceUtil.getMinuteMap());
 
 		// 途中退校している場合のみ設定
 		if (loginUserDto.getLeaveDate() != null) {
@@ -260,7 +239,13 @@ public class StudentAttendanceService {
 					.setTrainingDate(dateUtil.toString(attendanceManagementDto.getTrainingDate()));
 			dailyAttendanceForm
 					.setTrainingStartTime(attendanceManagementDto.getTrainingStartTime());
+			dailyAttendanceForm
+					.setTrainingStartTimeHh(attendanceUtil.getHour(attendanceManagementDto.getTrainingStartTime()));
+			dailyAttendanceForm
+			        .setTrainingStartTimeMi(attendanceUtil.getMinute(attendanceManagementDto.getTrainingStartTime()));
 			dailyAttendanceForm.setTrainingEndTime(attendanceManagementDto.getTrainingEndTime());
+			dailyAttendanceForm.setTrainingEndTimeHh(attendanceUtil.getHour(attendanceManagementDto.getTrainingEndTime()));
+			dailyAttendanceForm.setTrainingEndTimeMi(attendanceUtil.getMinute(attendanceManagementDto.getTrainingEndTime()));	
 			if (attendanceManagementDto.getBlankTime() != null) {
 				dailyAttendanceForm.setBlankTime(attendanceManagementDto.getBlankTime());
 				dailyAttendanceForm.setBlankTimeValue(String.valueOf(
@@ -288,6 +273,9 @@ public class StudentAttendanceService {
 	 * @throws ParseException
 	 */
 	public String update(AttendanceForm attendanceForm) throws ParseException {
+		
+		//入力された出退勤の{時間}{分}をhh:mm形式に変換
+		formatConversion(attendanceForm);
 
 		Integer lmsUserId = loginUserUtil.isStudent() ? loginUserDto.getLmsUserId()
 				: attendanceForm.getLmsUserId();
@@ -355,6 +343,45 @@ public class StudentAttendanceService {
 		}
 		// 完了メッセージ
 		return messageUtil.getMessage(Constants.PROP_KEY_ATTENDANCE_UPDATE_NOTICE);
+	}
+	
+	/**
+	 * 過去日の未入力チェック
+	 * 
+	 * @return 勤怠管理画面用DTOリスト
+	 * @throws ParseException
+	 */
+	public Boolean notEnterCheck()
+			throws ParseException {
+		//今日より前の過去日に、未入力の勤怠があるかどうかを判定する。
+		
+		//今日の日付を取得する。
+		//※attendanceUtil.getTrainingDate()内で、
+		//SimpleDateFormatクラスによるフォーマットパターンの設定が行われる
+		Date trainingDate = attendanceUtil.getTrainingDate();
+		
+		//tStudentAttendanceMapper.notEnterCount を呼び出し、未入力件数を取得する。
+		Integer notEnterCount = 
+		tStudentAttendanceMapper.notEnterCount(loginUserDto.getLmsUserId(), Constants.DB_FLG_FALSE, trainingDate);
+		
+		//件数が 0 より大きければ true、そうでなければ false を戻す。
+		return notEnterCount > 0;
+	}
+	
+	/**
+	 * 出退勤の{時間}{分}をhh:mm形式に変換し、AttendanceFormにセットする
+	 * 
+	 * @param attendanceForm
+	 */
+	public void formatConversion(AttendanceForm attendanceForm) {
+		//DailyAttendanceForm内のリストでループ
+		for (DailyAttendanceForm dailyAttendanceForm : attendanceForm.getAttendanceList()) {
+			if(dailyAttendanceForm.getTrainingStartTimeHh() != null
+			  &dailyAttendanceForm.getTrainingStartTimeHh() != null) {
+				dailyAttendanceForm.setTrainingStartTime(String.format("%02d", dailyAttendanceForm.getTrainingStartTimeHh())+":"+String.format("%02d", dailyAttendanceForm.getTrainingStartTimeMi()));
+				dailyAttendanceForm.setTrainingEndTime(String.format("%02d", dailyAttendanceForm.getTrainingEndTimeHh())+":"+String.format("%02d", dailyAttendanceForm.getTrainingEndTimeMi()));	
+			}
+		}
 	}
 
 }
