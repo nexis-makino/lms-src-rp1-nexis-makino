@@ -376,9 +376,14 @@ public class StudentAttendanceService {
 	public void formatConversion(AttendanceForm attendanceForm) {
 		//DailyAttendanceForm内のリストでループ
 		for (DailyAttendanceForm dailyAttendanceForm : attendanceForm.getAttendanceList()) {
+			//出勤時間を形成
 			if(dailyAttendanceForm.getTrainingStartTimeHh() != null
-			  &dailyAttendanceForm.getTrainingStartTimeHh() != null) {
+			  &dailyAttendanceForm.getTrainingStartTimeMi() != null) {
 				dailyAttendanceForm.setTrainingStartTime(String.format("%02d", dailyAttendanceForm.getTrainingStartTimeHh())+":"+String.format("%02d", dailyAttendanceForm.getTrainingStartTimeMi()));
+			}
+			//退勤時間を形成
+			if(dailyAttendanceForm.getTrainingEndTimeHh() != null
+			  &dailyAttendanceForm.getTrainingEndTimeMi() != null) {
 				dailyAttendanceForm.setTrainingEndTime(String.format("%02d", dailyAttendanceForm.getTrainingEndTimeHh())+":"+String.format("%02d", dailyAttendanceForm.getTrainingEndTimeMi()));	
 			}
 		}
